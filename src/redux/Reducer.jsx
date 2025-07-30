@@ -1,3 +1,6 @@
+/* eslint-disable no-case-declarations */
+
+
 
 
 const initialState = {
@@ -14,7 +17,14 @@ const todoReducer = (state = initialState, action) => {
     case "DELETE_TODO":
       return {
         ...state,
-        todos: state.todos.filter((_, idx) => idx !== action.payload),
+        todos: state.todos.filter((_, i) => i !== action.payload),
+      };
+    case "EDIT_TODO":
+      const updatedTodos = [...state.todos];
+      updatedTodos[action.payload.index].text = action.payload.newText;
+      return {
+        ...state,
+        todos: updatedTodos,
       };
     default:
       return state;
@@ -22,3 +32,4 @@ const todoReducer = (state = initialState, action) => {
 };
 
 export default todoReducer;
+

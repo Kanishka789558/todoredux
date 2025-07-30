@@ -1,17 +1,28 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addTodo, deleteTodo } from "../redux/Action";
+import { addTodo, deleteTodo, editTodo } from "../redux/Action";
 
 const Todo = () => {
   const [text, setText] = useState("");
+  const [editIndex, setEditIndex] = useState(null);
   const todos = useSelector((state) => state.todos);
   const dispatch = useDispatch();
 
-  const handleAdd = () => {
-    if (text.trim() !== "") {
+  const handleAddOrEdit = () => {
+    if (text.trim() === "") return;
+
+    if (editIndex !== null) {
+      dispatch(editTodo(editIndex, text));
+      setEditIndex(null);
+    } else {
       dispatch(addTodo(text));
-      setText("");
     }
+    setText("");
+  };
+
+  const handleEdit = (index) => {
+    setText(todos[index].text);
+    setEditIndex(index);
   };
 
   const handleDelete = (index) => {
@@ -29,18 +40,22 @@ const Todo = () => {
           placeholder="Enter a task"
           style={styles.input}
         />
-        <button onClick={handleAdd} style={styles.button}>Add</button>
+        <button onClick={handleAddOrEdit} style={styles.button}>
+          {editIndex !== null ? "Update" : "Add"}
+        </button>
       </div>
       <ul style={styles.todoList}>
         {todos.map((todo, index) => (
           <li key={index} style={styles.todoItem}>
             {todo.text}
-            <button
-              onClick={() => handleDelete(index)}
-              style={styles.deleteButton}
-            >
-              delete
-            </button>
+            <div>
+              <button onClick={() => handleEdit(index)} style={styles.editBtn}>
+                Edit
+              </button>
+              <button onClick={() => handleDelete(index)} style={styles.deleteBtn}>
+                Delete
+              </button>
+            </div>
           </li>
         ))}
       </ul>
@@ -95,14 +110,23 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "center",
   },
-  deleteButton: {
-    backgroundColor: "transparent",
+  editBtn: {
+    marginRight: "10px",
+    padding: "6px 10px",
+    backgroundColor: "#ffa500",
     border: "none",
-    fontSize: "1.2rem",
+    color: "white",
+    borderRadius: "4px",
     cursor: "pointer",
-    color: "red",
+  },
+  deleteBtn: {
+    padding: "6px 10px",
+    backgroundColor: "#e63946",
+    border: "none",
+    color: "white",
+    borderRadius: "4px",
+    cursor: "pointer",
   },
 };
 
 export default Todo;
-
